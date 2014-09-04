@@ -29,9 +29,10 @@ class ImageViewer(QtGui.QMainWindow):
     def __init__(self, app, filename=None):
         super(ImageViewer, self).__init__()
         self.app = app
-        self.wireframe_mode = 0
-        self.view = GraphicsView(wireframe_mode=self.wireframe_mode)
+ 		self.container = QtGui.QWidget(self)
+        self.view = GraphicsView()
         self.scene = GraphicsScene()
+        self.sidebar = SegmentListWidget(self)
         self.view.setViewportUpdateMode(QtGui.QGraphicsView.FullViewportUpdate)
         self.view.setTransformationAnchor(QtGui.QGraphicsView.AnchorUnderMouse)
         self.view.setRenderHint(QtGui.QPainter.Antialiasing)
@@ -40,7 +41,16 @@ class ImageViewer(QtGui.QMainWindow):
         self.scene.setGraphicsView(self.view)
         self.view.setScene(self.scene)
         self.view.setCacheMode(QtGui.QGraphicsView.CacheBackground)
-        self.setCentralWidget(self.view)
+
+        self.setCentralWidget(self.container)
+        self.layout = QtGui.QGridLayout(self.container)
+        policy = QtGui.QSizePolicy(
+            QtGui.QSizePolicy.Expanding, 
+            QtGui.QSizePolicy.Expanding)
+        self.setSizePolicy(policy)
+        self.layout.addWidget(self.view, 0, 0)
+        self.layout.addWidget(self.sidebar, 0, 1) 
+
         self.view.move_box = BoxResizable(QtCore.QRectF(10, 10, 100, 100),
                                           color=QtCore.Qt.red,
                                           transparent=True,
