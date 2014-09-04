@@ -29,7 +29,7 @@ class ImageViewer(QtGui.QMainWindow):
     def __init__(self, app, filename=None):
         super(ImageViewer, self).__init__()
         self.app = app
- 		self.container = QtGui.QWidget(self)
+        self.container = QtGui.QWidget(self)
         self.view = GraphicsView()
         self.scene = GraphicsScene()
         self.sidebar = SegmentListWidget(self)
@@ -57,8 +57,7 @@ class ImageViewer(QtGui.QMainWindow):
                                           scene=self.scene)
         self.scene.addItem(self.view.move_box)
         self.view.move_box.setVisible(False)
-        if not self.wireframe_mode:
-            self.view.move_box.setZValue(1E9)
+        self.view.move_box.setZValue(1E9)
 
         if filename is None:
             image = QtGui.QImage()
@@ -116,6 +115,14 @@ class ImageViewer(QtGui.QMainWindow):
     def about(self):
         QtGui.QMessageBox.about(self, "Insect Selector",
                                 "Stefan van der Walt\nPieter Holtzhausen")
+        
+    def get_icon(self, box):
+        pixmap = self.image_item.pixmap().copy(box._rect.toRect())
+        # pixmap = QtGui.QPixmap('/home/tzhau/hacking/inselect/inselect/fin.jpg')
+        pixmap = pixmap.scaledToWidth(200, QtCore.Qt.SmoothTransformation)
+        icon = QtGui.QIcon()
+        icon.addPixmap(pixmap) 
+        return icon
 
     def add_box(self, rect):
         x, y, w, h = rect
@@ -123,13 +130,15 @@ class ImageViewer(QtGui.QMainWindow):
         e = QtCore.QPoint(x + w, y + h)
         qrect = QtCore.QRectF(s.x(), s.y(), e.x() - s.x(), e.y() - s.y())
         box = BoxResizable(qrect,
-                           transparent=self.wireframe_mode,
+                           transparent=False,
                            scene=self.scene)
         self.view.add_item(box)
-        if not self.wireframe_mode:
-            b = box.boundingRect()
-            box.setZValue(max(1000, 1E9 - b.width() * b.height()))
-            box.updateResizeHandles()
+        b = box.boundingRect()
+        box.setZValue(max(1000, 1E9 - b.width() * b.height()))
+        box.updateResizeHandles()
+        icon = self.get_icon(box)
+        item = ListItem(icon, "text", box=box)
+        self.sidebar.addItem(item) 
 
     def segment(self):
         self.progressDialog = QtGui.QProgressDialog(self)
