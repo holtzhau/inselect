@@ -328,8 +328,7 @@ class BoxResizable(QtGui.QGraphicsRectItem):
             self.setZValue(max(1000, 1E9 - b.width() * b.height()))
 
     def map_rect_to_scene(self, rect):
-        """Map rect coordinates to the actual display scene rect
-        coordinates.
+        """Map rect coordinates to the display scene rect coordinates.
 
         Parameters:
         -----------
