@@ -25,6 +25,45 @@ def segment_worker(image, results_queue, window=None):
     results_queue.put(rects)
 
 
+
+class ListItem(QtGui.QListWidgetItem):
+    def __init__(self, icon, text, parent=None, box=None):
+        super(ListItem, self).__init__(icon, text, parent) 
+        self.original_icon = icon
+        self.original_text = text
+        self.box = box 
+
+
+class SegmentListWidget(QtGui.QListWidget):
+    def __init__(self, parent=None):
+        super(SegmentListWidget, self).__init__(parent) 
+        self.setIconSize(QtCore.QSize(100, 100))
+        self.setViewMode(QtGui.QListView.IconMode)
+        self.setDragEnabled(False)
+        self.setResizeMode(QtGui.QListView.Adjust)
+        self.setMovement(QtGui.QListView.Static)
+        self.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
+        self.itemClicked.connect(self.on_item_clicked)
+        self.itemDoubleClicked.connect(self.on_item_double_clicked)
+        self.setMinimumWidth(100)
+        self.parent = parent
+
+    def keyPressEvent(self, event):
+        self.parent.view.keyPressEvent(event)
+        QtGui.QListWidget.keyPressEvent(self, event)
+
+
+    def on_item_clicked(self, item):
+        for box in self.parent.view.items:
+            box.setSelected(False)
+        item.box.setSelected(True)
+        print dir(item.box)
+        print "clicked"
+
+    def on_item_double_clicked(self, item):
+        print "double clicked"
+
+
 class ImageViewer(QtGui.QMainWindow):
     def __init__(self, app, filename=None):
         super(ImageViewer, self).__init__()
@@ -42,14 +81,18 @@ class ImageViewer(QtGui.QMainWindow):
         self.view.setScene(self.scene)
         self.view.setCacheMode(QtGui.QGraphicsView.CacheBackground)
 
-        self.setCentralWidget(self.container)
-        self.layout = QtGui.QGridLayout(self.container)
-        policy = QtGui.QSizePolicy(
-            QtGui.QSizePolicy.Expanding, 
-            QtGui.QSizePolicy.Expanding)
-        self.setSizePolicy(policy)
-        self.layout.addWidget(self.view, 0, 0)
-        self.layout.addWidget(self.sidebar, 0, 1) 
+        self.setCentralWidget(self.splitter)
+        self.splitter.addWidget(self.view)
+        self.splitter.addWidget(self.sidebar)
+        # self.splitter.setStretchFactor(0, 0)
+        # self.splitter.setStretchFactor(1, 0)
+        # self.layout = QtGui.QGridLayout(self.container)
+        # policy = QtGui.QSizePolicy(
+        #     QtGui.QSizePolicy.Expanding, 
+        #     QtGui.QSizePolicy.Expanding)
+        # self.setSizePolicy(policy)
+        # self.layout.addWidget(self.view, 0, 0)
+        # self.layout.addWidget(self.sidebar, 0, 1) 
 
         self.view.move_box = BoxResizable(QtCore.QRectF(10, 10, 100, 100),
                                           color=QtCore.Qt.red,
@@ -137,7 +180,7 @@ class ImageViewer(QtGui.QMainWindow):
         box.setZValue(max(1000, 1E9 - b.width() * b.height()))
         box.updateResizeHandles()
         icon = self.get_icon(box)
-        item = ListItem(icon, "text", box=box)
+        item = ListItem(icon, str(len(self.view.items) - 1), box=box)
         self.sidebar.addItem(item) 
 
     def segment(self):
