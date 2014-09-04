@@ -24,7 +24,7 @@ class GraphicsView(QtGui.QGraphicsView):
         icon = window.get_icon(item)
         from image_viewer import ListItem
         list_item = ListItem(icon, str(len(self.items)), box=item)
-        sidebar.addItem(list_item) 
+        sidebar.addItem(list_item)
 
         self.items.append(item)
         self.scene().addItem(item)
@@ -62,12 +62,9 @@ class GraphicsView(QtGui.QGraphicsView):
                         remove_index.append(i)
             for i in reversed(remove_index):
                 sidebar.takeItem(i)
-
             for box in list(self.items):
-                # if hasattr(box, "isSelected") and box.isSelected():
                 if box.isSelected():
                     self.remove_item(box)
-            
         QtGui.QGraphicsView.keyPressEvent(self, event)
 
     def mousePressEvent(self, event):
