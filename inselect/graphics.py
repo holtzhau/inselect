@@ -76,20 +76,21 @@ class GraphicsView(QtGui.QGraphicsView):
             return
 
         elif event.button() == QtCore.Qt.LeftButton and not self.is_resizing:
+            pass
             # reveal hidden boxes, smallest to the front
-            if self.wireframe_mode:
-                e = self.mapToScene(event.pos().x(), event.pos().y())
-                items = self.scene().items(e)
-                items = [item for item in items if item in self.items]
-                if items:
-                    items.sort(lambda a, b: cmp(a.boundingRect().width() *
-                                                a.boundingRect().height(),
-                                                b.boundingRect().width() *
-                                                b.boundingRect().height()))
-                    for item in self.items:
-                        item.setZValue(1000)
-                    items[0].setZValue(1001)
-                    self.move_box.setZValue(1002)
+            # if self.wireframe_mode:
+            #     e = self.mapToScene(event.pos().x(), event.pos().y())
+            #     items = self.scene().items(e)
+            #     items = [item for item in items if item in self.items]
+            #     if items:
+            #         items.sort(lambda a, b: cmp(a.boundingRect().width() *
+            #                                     a.boundingRect().height(),
+            #                                     b.boundingRect().width() *
+            #                                     b.boundingRect().height()))
+            #         for item in self.items:
+            #             item.setZValue(1000)
+            #         items[0].setZValue(1001)
+            #         self.move_box.setZValue(1002)
         elif event.button() == QtCore.Qt.RightButton:
             self.box_create_start = QtCore.QPoint(event.pos())
             return
@@ -144,17 +145,13 @@ class GraphicsView(QtGui.QGraphicsView):
             if w != 0 and h != 0:
                 box = BoxResizable(QtCore.QRectF(s.x(), s.y(), w, h),
                                    scene=self.scene())
-                if not self.wireframe_mode:
-                    b = box.boundingRect()
-                    box.setZValue(max(1000, 1E9 - b.width() * b.height()))
-                    box.updateResizeHandles()
+                b = box.boundingRect()
+                box.setZValue(max(1000, 1E9 - b.width() * b.height()))
+                box.updateResizeHandles()
                 self.add_item(box)
         if self.move_box:
             self.move_box.setVisible(False)
             self.box_create_start = QtCore.QPoint()
-
-        w = np.abs(s.x() - e.x())
-        h = np.abs(s.y() - e.y())
 
 class GraphicsScene(QtGui.QGraphicsScene):
     def __init__(self, parent=None):
