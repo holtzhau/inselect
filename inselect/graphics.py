@@ -6,6 +6,7 @@ from PySide import QtCore, QtGui
 
 import image_viewer
 
+
 class GraphicsView(QtGui.QGraphicsView):
     def __init__(self, parent=None):
         QtGui.QGraphicsView.__init__(self, parent)
@@ -152,6 +153,7 @@ class GraphicsView(QtGui.QGraphicsView):
         if self.move_box:
             self.move_box.setVisible(False)
             self.box_create_start = QtCore.QPoint()
+
 
 class GraphicsScene(QtGui.QGraphicsScene):
     def __init__(self, parent=None):
